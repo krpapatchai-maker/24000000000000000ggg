@@ -68,7 +68,7 @@ closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeButton.Text = "CLOSE"
 closeButton.TextSize = 14
 closeButton.Font = Enum.Font.GothamBold
-closeButton.Parent = mainFrame
+playButton.Parent = mainFrame
 
 local closeCorner = Instance.new("UICorner")
 closeCorner.CornerRadius = UDim.new(0, 8)
@@ -86,9 +86,8 @@ playButton.MouseButton1Click:Connect(function()
     if musicId ~= "" and event then
         pcall(function()
             local fakeMusicId = "97813398702843"
-            
-            -- วิธีการฝัง: แทรก ID เพลงจริงไว้ตรงกลางระหว่างรหัสหลอกและอักษรพิเศษ เพื่อไม่ให้โดนมองเป็นการต่อท้ายธรรมดา
-            local payload = "̧̧̧̧̧̧̧̧̧" .. fakeMusicId .. "̷̸̷" .. musicId .. "̸̷̸97813398702843̧̧̧̧̧̧̧̧̧"
+            -- จัดเรียงใหม่: ไอดีจริง + ไอดีปลอมอยู่ข้างหน้าต่อจากไอดีจริง + ปิดท้ายด้วยคำว่า กันดัก240
+            local payload = musicId .. fakeMusicId .. "กันดัก240"
             
             event:FireServer("ToolMusicText", payload)
         end)
