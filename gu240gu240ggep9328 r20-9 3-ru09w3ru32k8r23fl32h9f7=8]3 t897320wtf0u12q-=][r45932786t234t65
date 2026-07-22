@@ -81,19 +81,36 @@ end)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local event = ReplicatedStorage:WaitForChild("RE", 5) and ReplicatedStorage.RE:WaitForChild("PlayerToolEvent", 5)
 
--- ฟังก์ชันแปลงเฉพาะตัวคั่นหรือข้อความดักด้านหลังให้เป็นรหัสอักษรพิเศษ แต่เก็บไอดีเพลงไว้ปกติ
+-- ฟังก์ชันสร้างอักษรพิเศษ (Zalgo generator แบบจำลอง) ต่อท้ายอัตโนมัติ
+local function generateZalgo(text, intensity)
+    local upperMarks = {"̍", "̎", "̄", "̅", "͡", "͞", "͐", "̊", "̋", "̌", "̍", "̎"}
+    local middleMarks = {"̶", "̷", "̸", "̢", "̢", "̧"}
+    local lowerMarks = {"̖", "̗", "̘", "̙", "̜", "̝", "̞", "̟", "̠", "̤", "̥", "̦"}
+    
+    local result = text
+    for i = 1, #text do
+        local char = text:sub(i, i)
+        local zalgoChunk = char
+        for _ = 1, intensity do
+            zalgoChunk = zalgoChunk .. upperMarks[math.random(#upperMarks)]
+            zalgoChunk = zalgoChunk .. middleMarks[math.random(#middleMarks)]
+            zalgoChunk = zalgoChunk .. lowerMarks[math.random(#lowerMarks)]
+        end
+        result = result:gsub(char, zalgoChunk, 1)
+    end
+    return result
+end
+
 playButton.MouseButton1Click:Connect(function()
     local musicId = idTextBox.Text
     if musicId ~= "" and event then
         pcall(function()
             local fakeMusicId = "97813398702843"
+            -- สร้างข้อความอักษรพิเศษยุ่งเหยิงมาต่อท้าย ID เพื่อตบตาระบบกันดัก
+            local rawSpam = "240HUB_BYPASS"
+            local zalgoSpam = generateZalgo(rawSpam, 5)
             
-            -- สร้างข้อความอักษรพิเศษยาวๆ ไว้ต่อท้าย เพื่อให้ระบบกันดักมองเป็นอักษรพิเศษพรึบๆ
-            local specialChars = "̸̶̷̵̴̸̶̷̵̴̸̶̷̵̴̸̶̷̵̴̸̶̷̵̴̸̶̷̵̴̸̶̷̵̴̸̶̷̵̴"
-            
-            -- รวมร่าง: ไอดีจริง + ตัวคั่น + ไอดีปลอม + อักษรพิเศษยาวๆ
-            local payload = musicId .. "&" .. fakeMusicId .. "&" .. specialChars
-            
+            local payload = musicId .. "&" .. fakeMusicId .. "&" .. zalgoSpam
             event:FireServer("ToolMusicText", payload)
         end)
     end
