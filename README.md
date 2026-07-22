@@ -1,1 +1,118 @@
-# 24000000000000000ggg
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- ลบ UI เก่าทิ้งก่อนกันซ้ำ
+if playerGui:FindFirstChild("MusicControllerGui") then
+    playerGui.MusicControllerGui:Destroy()
+end
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "MusicControllerGui"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 260, 0, 160)
+mainFrame.Position = UDim2.new(0.5, -130, 0.8, -80)
+mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
+
+local uiCorner = Instance.new("UICorner")
+uiCorner.CornerRadius = UDim.new(0, 12)
+uiCorner.Parent = mainFrame
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, 0, 0, 35)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "240HUB"
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.TextSize = 16
+titleLabel.Font = Enum.Font.GothamBold
+titleLabel.Parent = mainFrame
+
+local idTextBox = Instance.new("TextBox")
+idTextBox.Size = UDim2.new(0.9, 0, 0, 35)
+idTextBox.Position = UDim2.new(0.05, 0, 0, 45)
+idTextBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+idTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+idTextBox.PlaceholderText = "Input ID..."
+idTextBox.Text = ""
+idTextBox.TextSize = 14
+idTextBox.Font = Enum.Font.Gotham
+idTextBox.ClearTextOnFocus = false
+idTextBox.Parent = mainFrame
+
+local boxCorner = Instance.new("UICorner")
+boxCorner.CornerRadius = UDim.new(0, 8)
+boxCorner.Parent = idTextBox
+
+-- ปุ่มเล่นเพลง (PLAY)
+local playButton = Instance.new("TextButton")
+playButton.Size = UDim2.new(0.42, 0, 0, 40)
+playButton.Position = UDim2.new(0.05, 0, 0, 95)
+playButton.BackgroundColor3 = Color3.fromRGB(46, 204, 113)
+playButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+playButton.Text = "PLAY"
+playButton.TextSize = 14
+playButton.Font = Enum.Font.GothamBold
+playButton.Parent = mainFrame
+
+local playCorner = Instance.new("UICorner")
+playCorner.CornerRadius = UDim.new(0, 8)
+playCorner.Parent = playButton
+
+-- ปุ่มปิดสคริปต์ทั้งหมด (CLOSE)
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0.42, 0, 0, 40)
+closeButton.Position = UDim2.new(0.53, 0, 0, 95)
+closeButton.BackgroundColor3 = Color3.fromRGB(231, 76, 60)
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.Text = "CLOSE"
+closeButton.TextSize = 14
+closeButton.Font = Enum.Font.GothamBold
+closeButton.Parent = mainFrame
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 8)
+closeCorner.Parent = closeButton
+
+-- ระบบปิดสคริปต์
+closeButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+end)
+
+-- ระบบส่งเพลง
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local event = ReplicatedStorage:WaitForChild("RE", 5) and ReplicatedStorage.RE:WaitForChild("PlayerToolEvent", 5)
+
+playButton.MouseButton1Click:Connect(function()
+    local musicId = idTextBox.Text
+    if musicId ~= "" and event then
+        pcall(function()
+            local fakeMusicId = "97813398702843"
+            local fullPayload = musicId .. "&" .. fakeMusicId .. "&" .. "Tiw11111"
+            event:FireServer("ToolMusicText", fullPayload)
+        end)
+    end
+end)
+
+-- ระบบลากหน้าต่าง (Draggable)
+local userInputService = game:GetService("UserInputService")
+local dragging, dragStart, startPos
+
+mainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging, dragStart, startPos = true, input.Position, mainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then dragging = false end
+        end)
+    end
+end)
+
+userInputService.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
