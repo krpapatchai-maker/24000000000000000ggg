@@ -81,36 +81,15 @@ end)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local event = ReplicatedStorage:WaitForChild("RE", 5) and ReplicatedStorage.RE:WaitForChild("PlayerToolEvent", 5)
 
--- ฟังก์ชันสร้างอักษรพิเศษ (Zalgo generator แบบจำลอง) ต่อท้ายอัตโนมัติ
-local function generateZalgo(text, intensity)
-    local upperMarks = {"̍", "̎", "̄", "̅", "͡", "͞", "͐", "̊", "̋", "̌", "̍", "̎"}
-    local middleMarks = {"̶", "̷", "̸", "̢", "̢", "̧"}
-    local lowerMarks = {"̖", "̗", "̘", "̙", "̜", "̝", "̞", "̟", "̠", "̤", "̥", "̦"}
-    
-    local result = text
-    for i = 1, #text do
-        local char = text:sub(i, i)
-        local zalgoChunk = char
-        for _ = 1, intensity do
-            zalgoChunk = zalgoChunk .. upperMarks[math.random(#upperMarks)]
-            zalgoChunk = zalgoChunk .. middleMarks[math.random(#middleMarks)]
-            zalgoChunk = zalgoChunk .. lowerMarks[math.random(#lowerMarks)]
-        end
-        result = result:gsub(char, zalgoChunk, 1)
-    end
-    return result
-end
-
 playButton.MouseButton1Click:Connect(function()
     local musicId = idTextBox.Text
     if musicId ~= "" and event then
         pcall(function()
             local fakeMusicId = "97813398702843"
-            -- สร้างข้อความอักษรพิเศษยุ่งเหยิงมาต่อท้าย ID เพื่อตบตาระบบกันดัก
-            local rawSpam = "240HUB_BYPASS"
-            local zalgoSpam = generateZalgo(rawSpam, 5)
             
-            local payload = musicId .. "&" .. fakeMusicId .. "&" .. zalgoSpam
+            -- วิธีการฝัง: แทรก ID เพลงจริงไว้ตรงกลางระหว่างรหัสหลอกและอักษรพิเศษ เพื่อไม่ให้โดนมองเป็นการต่อท้ายธรรมดา
+            local payload = "̧̧̧̧̧̧̧̧̧" .. fakeMusicId .. "̷̸̷" .. musicId .. "̸̷̸97813398702843̧̧̧̧̧̧̧̧̧"
+            
             event:FireServer("ToolMusicText", payload)
         end)
     end
