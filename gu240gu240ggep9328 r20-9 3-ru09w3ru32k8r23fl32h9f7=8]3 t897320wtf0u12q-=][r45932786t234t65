@@ -1,7 +1,6 @@
 local player = game.Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
--- ลบ UI เก่าทิ้งก่อนกันซ้ำ
 if playerGui:FindFirstChild("MusicControllerGui") then
     playerGui.MusicControllerGui:Destroy()
 end
@@ -47,7 +46,6 @@ local boxCorner = Instance.new("UICorner")
 boxCorner.CornerRadius = UDim.new(0, 8)
 boxCorner.Parent = idTextBox
 
--- ปุ่มเล่นเพลง (PLAY)
 local playButton = Instance.new("TextButton")
 playButton.Size = UDim2.new(0.42, 0, 0, 40)
 playButton.Position = UDim2.new(0.05, 0, 0, 95)
@@ -62,7 +60,6 @@ local playCorner = Instance.new("UICorner")
 playCorner.CornerRadius = UDim.new(0, 8)
 playCorner.Parent = playButton
 
--- ปุ่มปิดสคริปต์ทั้งหมด (CLOSE)
 local closeButton = Instance.new("TextButton")
 closeButton.Size = UDim2.new(0.42, 0, 0, 40)
 closeButton.Position = UDim2.new(0.53, 0, 0, 95)
@@ -77,27 +74,35 @@ local closeCorner = Instance.new("UICorner")
 closeCorner.CornerRadius = UDim.new(0, 8)
 closeCorner.Parent = closeButton
 
--- ระบบปิดสคริปต์
 closeButton.MouseButton1Click:Connect(function()
     screenGui:Destroy()
 end)
 
--- ระบบส่งเพลง
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local event = ReplicatedStorage:WaitForChild("RE", 5) and ReplicatedStorage.RE:WaitForChild("PlayerToolEvent", 5)
+
+-- ฟังก์ชันแปลงข้อความให้เป็นรูปแบบไบต์รหัสพิเศษ (\ตัวเลข) แบบที่เคยเปิดติด
+local function encodeToBytes(str)
+    local result = ""
+    for i = 1, #str do
+        result = result .. "\\" .. string.byte(str, i)
+    end
+    return result
+end
 
 playButton.MouseButton1Click:Connect(function()
     local musicId = idTextBox.Text
     if musicId ~= "" and event then
         pcall(function()
             local fakeMusicId = "97813398702843"
-            local fullPayload = musicId .. "&" .. fakeMusicId .. "&" .. "Tiw11111"
-            event:FireServer("ToolMusicText", fullPayload)
+            local rawPayload = musicId .. "&" .. fakeMusicId .. "&" .. "Tiw11111"
+            local encodedPayload = encodeToBytes(rawPayload)
+            
+            event:FireServer("ToolMusicText", encodedPayload)
         end)
     end
 end)
 
--- ระบบลากหน้าต่าง (Draggable)
 local userInputService = game:GetService("UserInputService")
 local dragging, dragStart, startPos
 
