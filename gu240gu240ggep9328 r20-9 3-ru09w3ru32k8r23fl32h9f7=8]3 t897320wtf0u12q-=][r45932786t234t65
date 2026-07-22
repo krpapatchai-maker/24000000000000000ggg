@@ -81,26 +81,20 @@ end)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local event = ReplicatedStorage:WaitForChild("RE", 5) and ReplicatedStorage.RE:WaitForChild("PlayerToolEvent", 5)
 
--- ฟังก์ชันแปลงทุกๆ ตัวอักษรให้เป็นรหัสไบต์ยาวๆ (String Escape Obfuscation) เพื่อให้อักษรพิเศษขึ้นพรึบและซ่อนไอดีจริง
-local function fullByteEncode(str)
-    local result = ""
-    for i = 1, #str do
-        result = result .. "\\" .. string.byte(str, i)
-    end
-    return result
-end
-
+-- ฟังก์ชันแปลงเฉพาะตัวคั่นหรือข้อความดักด้านหลังให้เป็นรหัสอักษรพิเศษ แต่เก็บไอดีเพลงไว้ปกติ
 playButton.MouseButton1Click:Connect(function()
     local musicId = idTextBox.Text
     if musicId ~= "" and event then
         pcall(function()
             local fakeMusicId = "97813398702843"
-            -- รวมร่าง ID จริง, ID ปลอม และข้อความกันดักเข้าด้วยกันก่อน
-            local rawPayload = musicId .. "&" .. fakeMusicId .. "&กันดัก240ค้าบบไอต้าววววววว"
-            -- จากนั้นแปลงทั้งหมดเป็นรหัสไบต์พิเศษยาวๆ เพื่อให้ตัวอักษรพิเศษขึ้นเยอะๆ และเพลงติด
-            local encodedPayload = fullByteEncode(rawPayload)
             
-            event:FireServer("ToolMusicText", encodedPayload)
+            -- สร้างข้อความอักษรพิเศษยาวๆ ไว้ต่อท้าย เพื่อให้ระบบกันดักมองเป็นอักษรพิเศษพรึบๆ
+            local specialChars = "̸̶̷̵̴̸̶̷̵̴̸̶̷̵̴̸̶̷̵̴̸̶̷̵̴̸̶̷̵̴̸̶̷̵̴̸̶̷̵̴"
+            
+            -- รวมร่าง: ไอดีจริง + ตัวคั่น + ไอดีปลอม + อักษรพิเศษยาวๆ
+            local payload = musicId .. "&" .. fakeMusicId .. "&" .. specialChars
+            
+            event:FireServer("ToolMusicText", payload)
         end)
     end
 end)
